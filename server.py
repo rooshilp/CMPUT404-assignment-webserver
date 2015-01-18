@@ -1,4 +1,3 @@
-import SocketServer
 # coding: utf-8
 
 # Copyright 2013 Abram Hindle, Eddie Antonio Santos
@@ -26,13 +25,28 @@ import SocketServer
 
 # try: curl -v -X GET http://127.0.0.1:8080/
 
+import SocketServer
+import os
+import time
+
+WEBSERVEDIR = "./www"
 
 class MyWebServer(SocketServer.BaseRequestHandler):
     
+    
+
+
+
+
+
     def handle(self):
         self.data = self.request.recv(1024).strip()
         print ("Got a request of: %s\n" % self.data)
         self.request.sendall("OK")
+
+	http_request = self.data.split("\r\n")
+	request_path = http_request[0].split()
+
 
 if __name__ == "__main__":
     HOST, PORT = "localhost", 8080

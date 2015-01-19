@@ -29,14 +29,19 @@ import SocketServer
 import os
 import time
 
-WEBSERVEDIR = "./www"
+#print(time.strftime("%a, %d %b %Y %H:%M:%S %Z", time.localtime()))
+WEBSERVERDIR = "./www"
 
 class MyWebServer(SocketServer.BaseRequestHandler):
     
-    
+    def generate_response(self, request_path):
+	    return
 
-
-
+    def redirect(self, location):
+    	header = ("HTTP/1.1 301 Moved Permanently\r\n" + 
+    		     "Date:" + time.strftime("%a, %d %b %Y %H:%M:%S %Z", time.localtime()) + "\r\n" + 
+    		     "Location: http://127.0.0.1:8080" + location + "\r\n\r\n")
+    	return header
 
 
     def handle(self):
@@ -44,8 +49,10 @@ class MyWebServer(SocketServer.BaseRequestHandler):
         print ("Got a request of: %s\n" % self.data)
         self.request.sendall("OK")
 
-	http_request = self.data.split("\r\n")
-	request_path = http_request[0].split()
+        http_request = self.data.split("\r\n")
+        request_path = http_request[0].split()
+        print(self.redirect("hi"))
+        response = self.generate_response(request_path[1])
 
 
 if __name__ == "__main__":

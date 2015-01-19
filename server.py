@@ -20,12 +20,13 @@
 # Foundation; All Rights Reserved
 #
 # http://docs.python.org/2/library/socketserver.html
+# https://docs.python.org/2/library/os.html
+# https://docs.python.org/2/library/time.html
+# https://docs.python.org/2/library/mimetypes.html
 #
 # run: python freetests.py
 
 # try: curl -v -X GET http://127.0.0.1:8080/
-
-#Additions added by Rooshil Patel
 
 import SocketServer
 import os

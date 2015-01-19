@@ -30,7 +30,7 @@ import os
 import time
 import mimetypes
 
-WEB_SERVER_DIR = "./www"
+WEB_SERVER_DIR = "/www"
 
 class MyWebServer(SocketServer.BaseRequestHandler):
     
@@ -44,6 +44,7 @@ class MyWebServer(SocketServer.BaseRequestHandler):
             return response
 
         actual_path = os.getcwd() + WEB_SERVER_DIR + request_path
+        print(actual_path)
 
         if os.path.isfile(actual_path):
             response = self.ok_file(actual_path)
@@ -61,7 +62,7 @@ class MyWebServer(SocketServer.BaseRequestHandler):
         mime_type = mimetypes.guess_type(file_path)
         header = ("HTTP/1.1 200 OK\r\n" + 
                  "Date: " + time.strftime("%a, %d %b %Y %H:%M:%S %Z", time.localtime()) + "\r\n" + 
-                 "Content-Type: " + mime_type + "\r\n\r\n")
+                 "Content-Type: " + mime_type[0] + "\r\n\r\n")
         
         file_open = open(file_path, "r")
         header += file_open.read()
@@ -88,8 +89,9 @@ class MyWebServer(SocketServer.BaseRequestHandler):
 
         http_request = self.data.split("\r\n")
         request_path = http_request[0].split()
-
+        print(request_path[1])
         response = self.generate_response(request_path[1])
+        print(response)
         self.request.sendall(response)
 
 if __name__ == "__main__":

@@ -44,7 +44,6 @@ class MyWebServer(SocketServer.BaseRequestHandler):
             return response
 
         actual_path = os.getcwd() + WEB_SERVER_DIR + request_path
-        print(actual_path)
 
         if os.path.isfile(actual_path):
             response = self.ok_file(actual_path)
@@ -85,13 +84,12 @@ class MyWebServer(SocketServer.BaseRequestHandler):
 
     def handle(self):
         self.data = self.request.recv(1024).strip()
-        print ("Got a request of: %s\n" % self.data)
+        print ("Got a request of:\n%s\n" % self.data)
 
         http_request = self.data.split("\r\n")
         request_path = http_request[0].split()
-        print(request_path[1])
         response = self.generate_response(request_path[1])
-        print(response)
+        print("Responding request with:\n%s\n" % response)
         self.request.sendall(response)
 
 if __name__ == "__main__":

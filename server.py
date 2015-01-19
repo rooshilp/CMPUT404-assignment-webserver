@@ -30,7 +30,7 @@ import os
 import time
 import mimetypes
 
-WEBSERVERDIR = "./www"
+WEB_SERVER_DIR = "./www"
 
 class MyWebServer(SocketServer.BaseRequestHandler):
     
@@ -39,8 +39,29 @@ class MyWebServer(SocketServer.BaseRequestHandler):
 	    if "/../" in request_path:
 	    	response = self.not_found()
 	        return response
+	    elif request_path == "/deep":
+	    	response = self.redirect("/deep/")
+	    	return response
 
+	    actual_path = os.getcwd() + WEB_SERVER_DIR + request_path
 
+	    if os.path.isfile(actual_path):
+	    	response = self.ok_file(actual_path)
+	    	return response
+        elif os.path.isdir(actual_path):
+        	actual_path += "index.html"
+        	response = self.ok_file(actual_path)
+        	return response
+        else:
+        	response = self.not_found()
+        	return response
+
+    def ok_file(self, file_path):
+    	mime_type = mimetypes.guess_type(file_path)
+    	header = ("HTTP/1.1 200 OK\r\n" + 
+    		     "Date: " + time.strftime("%a, %d %b %Y %H:%M:%S %Z", time.localtime()) + "\r\n" + 
+    		     "Content-Type: " + mime_type + "\r\n\r\n")
+    	return header
 
     def redirect(self, location):
     	header = ("HTTP/1.1 301 Moved Permanently\r\n" + 
@@ -51,7 +72,8 @@ class MyWebServer(SocketServer.BaseRequestHandler):
     def not_found(self):
     	header = ("HTTP/1.1 404 Not Found\r\n" +
     		     "Date: " + time.strftime("%a, %d %b %Y %H:%M:%S %Z", time.localtime()) + "\r\n" +
-    		     "Content-Type: text/html\r\n\r\n" + "<!DOCTYPE html>\n" +
+    		     "Content-Type: text/html\r\n\r\n" + 
+    		     "<!DOCTYPE html>\n" +
     		     "<html><body>\n" + "<h1>404: Not Found</h1>\n" + "</body></html>")
     	return header
 
@@ -61,8 +83,7 @@ class MyWebServer(SocketServer.BaseRequestHandler):
 
         http_request = self.data.split("\r\n")
         request_path = http_request[0].split()
-        print(self.redirect("hi"))
-        print(self.not_found())
+
         response = self.generate_response(request_path[1])
         self.request.sendall(response)
 

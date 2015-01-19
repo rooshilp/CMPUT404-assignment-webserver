@@ -5,3 +5,5 @@ http://tools.ietf.org/html/rfc2616 - used to understand HTTP response headers, r
 http://www.w3schools.com/htmL/ - used for refresher on basic HTML
 
 https://eclass.srv.ualberta.ca/mod/forum/discuss.php?d=441938 - reasoning for redirecting /deep to /deep/
+
+https://docs.python.org/2/index.html - used as a reference on usage of os, time and mimetypes modules

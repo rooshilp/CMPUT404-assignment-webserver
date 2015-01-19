@@ -28,32 +28,43 @@
 import SocketServer
 import os
 import time
+import mimetypes
 
-#print(time.strftime("%a, %d %b %Y %H:%M:%S %Z", time.localtime()))
 WEBSERVERDIR = "./www"
 
 class MyWebServer(SocketServer.BaseRequestHandler):
     
     def generate_response(self, request_path):
-	    return
+	    response = ""
+	    if "/../" in request_path:
+	    	response = self.not_found()
+	        return response
+
+
 
     def redirect(self, location):
     	header = ("HTTP/1.1 301 Moved Permanently\r\n" + 
-    		     "Date:" + time.strftime("%a, %d %b %Y %H:%M:%S %Z", time.localtime()) + "\r\n" + 
+    		     "Date: " + time.strftime("%a, %d %b %Y %H:%M:%S %Z", time.localtime()) + "\r\n" + 
     		     "Location: http://127.0.0.1:8080" + location + "\r\n\r\n")
     	return header
 
+    def not_found(self):
+    	header = ("HTTP/1.1 404 Not Found\r\n" +
+    		     "Date: " + time.strftime("%a, %d %b %Y %H:%M:%S %Z", time.localtime()) + "\r\n" +
+    		     "Content-Type: text/html\r\n\r\n" + "<!DOCTYPE html>\n" +
+    		     "<html><body>\n" + "<h1>404: Not Found</h1>\n" + "</body></html>")
+    	return header
 
     def handle(self):
         self.data = self.request.recv(1024).strip()
         print ("Got a request of: %s\n" % self.data)
-        self.request.sendall("OK")
 
         http_request = self.data.split("\r\n")
         request_path = http_request[0].split()
         print(self.redirect("hi"))
+        print(self.not_found())
         response = self.generate_response(request_path[1])
-
+        self.request.sendall(response)
 
 if __name__ == "__main__":
     HOST, PORT = "localhost", 8080

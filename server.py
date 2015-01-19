@@ -35,47 +35,52 @@ WEB_SERVER_DIR = "./www"
 class MyWebServer(SocketServer.BaseRequestHandler):
     
     def generate_response(self, request_path):
-	    response = ""
-	    if "/../" in request_path:
-	    	response = self.not_found()
-	        return response
-	    elif request_path == "/deep":
-	    	response = self.redirect("/deep/")
-	    	return response
+        response = ""
+        if "/../" in request_path:
+            response = self.not_found()
+            return response
+        elif request_path == "/deep":
+            response = self.redirect("/deep/")
+            return response
 
-	    actual_path = os.getcwd() + WEB_SERVER_DIR + request_path
+        actual_path = os.getcwd() + WEB_SERVER_DIR + request_path
 
-	    if os.path.isfile(actual_path):
-	    	response = self.ok_file(actual_path)
-	    	return response
+        if os.path.isfile(actual_path):
+            response = self.ok_file(actual_path)
+            return response
+        
         elif os.path.isdir(actual_path):
-        	actual_path += "index.html"
-        	response = self.ok_file(actual_path)
-        	return response
+            actual_path += "index.html"
+            response = self.ok_file(actual_path)
+            return response
         else:
-        	response = self.not_found()
-        	return response
+            response = self.not_found()
+            return response
 
     def ok_file(self, file_path):
-    	mime_type = mimetypes.guess_type(file_path)
-    	header = ("HTTP/1.1 200 OK\r\n" + 
-    		     "Date: " + time.strftime("%a, %d %b %Y %H:%M:%S %Z", time.localtime()) + "\r\n" + 
-    		     "Content-Type: " + mime_type + "\r\n\r\n")
-    	return header
+        mime_type = mimetypes.guess_type(file_path)
+        header = ("HTTP/1.1 200 OK\r\n" + 
+                 "Date: " + time.strftime("%a, %d %b %Y %H:%M:%S %Z", time.localtime()) + "\r\n" + 
+                 "Content-Type: " + mime_type + "\r\n\r\n")
+        
+        file_open = open(file_path, "r")
+        header += file_open.read()
+        file_open.close()
+        return header
 
     def redirect(self, location):
-    	header = ("HTTP/1.1 301 Moved Permanently\r\n" + 
-    		     "Date: " + time.strftime("%a, %d %b %Y %H:%M:%S %Z", time.localtime()) + "\r\n" + 
-    		     "Location: http://127.0.0.1:8080" + location + "\r\n\r\n")
-    	return header
+        header = ("HTTP/1.1 301 Moved Permanently\r\n" + 
+                 "Date: " + time.strftime("%a, %d %b %Y %H:%M:%S %Z", time.localtime()) + "\r\n" + 
+                 "Location: http://127.0.0.1:8080" + location + "\r\n\r\n")
+        return header
 
     def not_found(self):
-    	header = ("HTTP/1.1 404 Not Found\r\n" +
-    		     "Date: " + time.strftime("%a, %d %b %Y %H:%M:%S %Z", time.localtime()) + "\r\n" +
-    		     "Content-Type: text/html\r\n\r\n" + 
-    		     "<!DOCTYPE html>\n" +
-    		     "<html><body>\n" + "<h1>404: Not Found</h1>\n" + "</body></html>")
-    	return header
+        header = ("HTTP/1.1 404 Not Found\r\n" +
+                 "Date: " + time.strftime("%a, %d %b %Y %H:%M:%S %Z", time.localtime()) + "\r\n" +
+                 "Content-Type: text/html\r\n\r\n" + 
+                 "<!DOCTYPE html>\n" +
+                 "<html><body>\n" + "<h1>404: Not Found</h1>\n" + "</body></html>")
+        return header
 
     def handle(self):
         self.data = self.request.recv(1024).strip()

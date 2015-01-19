@@ -1,6 +1,6 @@
 # coding: utf-8
 
-# Copyright 2013 Abram Hindle, Eddie Antonio Santos
+# Copyright 2014 Abram Hindle, Eddie Antonio Santos, Rooshil Patel
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,6 +25,8 @@
 
 # try: curl -v -X GET http://127.0.0.1:8080/
 
+#Additions added by Rooshil Patel
+
 import SocketServer
 import os
 import time
@@ -34,11 +36,16 @@ WEB_SERVER_DIR = "/www"
 
 class MyWebServer(SocketServer.BaseRequestHandler):
     
+    #Method generates response to send back to requesting client
+    #Able to either generate 200, 301 or 404 responses
     def generate_response(self, request_path):
         response = ""
+        
+        #Checks and prevents attempts at path traversal
         if "/../" in request_path:
             response = self.not_found()
             return response
+        #Redirects /deep to /deep/ as per eclass discussion https://eclass.srv.ualberta.ca/mod/forum/discuss.php?d=441938
         elif request_path == "/deep":
             response = self.redirect("/deep/")
             return response

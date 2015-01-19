@@ -52,10 +52,12 @@ class MyWebServer(SocketServer.BaseRequestHandler):
 
         actual_path = os.getcwd() + WEB_SERVER_DIR + request_path
 
+        #determines if the path points to a file
         if os.path.isfile(actual_path):
             response = self.ok_file(actual_path)
             return response
         
+        #determines if the path points to a directory
         elif os.path.isdir(actual_path):
             actual_path += "index.html"
             response = self.ok_file(actual_path)
@@ -63,8 +65,10 @@ class MyWebServer(SocketServer.BaseRequestHandler):
         else:
             response = self.not_found()
             return response
-
+    
+    #generates 200 OK header and attaches file content to be sent
     def ok_file(self, file_path):
+        #determines mimetype for file to be served
         mime_type = mimetypes.guess_type(file_path)
         header = ("HTTP/1.1 200 OK\r\n" + 
                  "Date: " + time.strftime("%a, %d %b %Y %H:%M:%S %Z", time.localtime()) + "\r\n" + 
@@ -75,12 +79,14 @@ class MyWebServer(SocketServer.BaseRequestHandler):
         file_open.close()
         return header
 
+    #generates 301 Moved Permanently header using location provided
     def redirect(self, location):
         header = ("HTTP/1.1 301 Moved Permanently\r\n" + 
                  "Date: " + time.strftime("%a, %d %b %Y %H:%M:%S %Z", time.localtime()) + "\r\n" + 
                  "Location: http://127.0.0.1:8080" + location + "\r\n\r\n")
         return header
 
+    #generates 404 not found header
     def not_found(self):
         header = ("HTTP/1.1 404 Not Found\r\n" +
                  "Date: " + time.strftime("%a, %d %b %Y %H:%M:%S %Z", time.localtime()) + "\r\n" +
@@ -93,6 +99,7 @@ class MyWebServer(SocketServer.BaseRequestHandler):
         self.data = self.request.recv(1024).strip()
         print ("Got a request of:\n%s\n" % self.data)
 
+        #parses request
         http_request = self.data.split("\r\n")
         request_path = http_request[0].split()
         response = self.generate_response(request_path[1])
